@@ -1355,21 +1355,34 @@ const LV_NAME = {1:"极低",2:"低",3:"中",4:"高",5:"极高"};
   }
 
   var COUNTY_EVENT_BRIEFS = {
-    '吉州区':{rain:269},'新干县':{rain:235},'峡江县':{rain:209},'吉安县':{rain:197},
-    '青原区':{rain:180},'吉水县':{rain:155},'永新县':{rain:136},'永丰县':{rain:131},
-    '泰和县':{rain:113},'安福县':{rain:110},'井冈山市':{rain:83},'万安县':{rain:50},'遂川县':{rain:31}
+    '吉州区':269,'新干县':235,'峡江县':209,'吉安县':197,'青原区':180,'吉水县':155,
+    '永新县':136,'永丰县':131,'泰和县':113,'安福县':110,'井冈山市':83,'万安县':50,'遂川县':31
   };
   function renderCountyEvent(name){
     var box = document.getElementById('countyEventBrief');
     if(!box) return;
-    var event = COUNTY_EVENT_BRIEFS[name];
-    if(!event){box.innerHTML='';return;}
-    var html = '<h4>历史事件简述</h4><div><b>2020·7·10 暴雨洪水：</b>该县过程雨量 '+event.rain+' mm。水文分析报告统计全市 13 县（市、区）共 77.7 万人受灾、8.32 万人紧急转移、直接经济损失 19.2 亿元；未公布'+name+'单县损失拆分，勿将全市数值当作本县数值。</div>';
-    if(name==='遂川县'){
-      html += '<div style="margin-top:6px"><b>2026·9·5 地质灾害（另列）：</b>高坪镇明坑村石下组泥石流最终 13 人遇难；截至 9 月 10 日 8 时，全县累计转移 21,455 人。此为强降雨诱发的地质灾害统计，不等同于洪水直接损失。</div>';
+    var rain = COUNTY_EVENT_BRIEFS[name];
+    if(rain==null){box.innerHTML='';return;}
+    var items = [
+      '<li><b>2020·7·10 暴雨洪水：</b>'+name+'过程雨量 '+rain+' mm；水文分析报告给出全市汇总：77.7 万人受灾、83,200 人转移、直接损失 19.2 亿元，未拆分到县。<a href="https://www.hydropower-wr.com/index.php/hwr/article/view/3828/3670" target="_blank" rel="noreferrer">水文分析论文</a></li>',
+      '<li><b>2026·9·4 赣江洪水：</b>吉安水文站实测 50.51 m，超警 0.01 m；这是市级水情，不代表该县受灾人数。<a href="https://jxja.jxnews.cn/system/2026/09/04/031235923.shtml" target="_blank" rel="noreferrer">吉安发布</a></li>'
+    ];
+    if(name==='安福县'){
+      items.unshift('<li><b>2015·5·27—28 暴雨及滑坡：</b>浒坑镇雨量 179 mm，滑坡压垮 25 栋房屋、造成 4 人遇难，农田受淹 2,100 亩。此为滑坡灾情，不能记作洪水溺亡。<a href="https://news.cnr.cn/native/city/20150528/t20150528_518675131.shtml" target="_blank" rel="noreferrer">央广网</a></li>');
+      items.splice(1,0,'<li><b>2016·5·19—20 强降雨：</b>安福雨量 146.3 mm；吉安受灾区转移记录中安福 830 人。<a href="https://www.chinawater.com.cn/newscenter/df/jx/201605/t20160520_441294.html" target="_blank" rel="noreferrer">中国水利</a> · <a href="https://news.weather.com.cn/2016/05/2519834.shtml" target="_blank" rel="noreferrer">转移统计</a></li>');
+      items.splice(2,0,'<li><b>2020·6·23—25 暴雨洪涝：</b>部分乡镇雨量超过 110 mm；全县报告 21,501 人受灾、8,517 人转移，直接经济损失约 2,988.71 万元。<a href="https://jxja.jxnews.cn/system/2020/06/25/018946094.shtml" target="_blank" rel="noreferrer">吉安频道报道</a></li>');
     }
-    html += '<div class="event-meta">来源：赣江中游水文水资源监测中心、吉安县水利局《2020年吉安市“7.10”暴雨洪水分析》；遂川后续统计见江西日报 2026-09-11。</div>';
-    box.innerHTML=html;
+    if(name==='永新县'){
+      items.unshift('<li><b>2016·5·19—20 强降雨：</b>永新雨量 162.5 mm，水文记录禾水永新站超警；该轮吉安受灾区转移 671 人。<a href="https://www.chinawater.com.cn/newscenter/df/jx/201605/t20160520_441294.html" target="_blank" rel="noreferrer">中国水利</a> · <a href="https://news.weather.com.cn/2016/05/2519834.shtml" target="_blank" rel="noreferrer">转移统计</a></li>');
+      items.splice(1,0,'<li><b>2019·6·7—8 洪水围困：</b>高桥楼镇 4 个村 300 余名村民被困，后全部安全转移。<a href="https://www.cneb.gov.cn/2019/06/09/ARTI1560010848175426.shtml" target="_blank" rel="noreferrer">国家应急广播</a></li>');
+    }
+    if(name==='泰和县'){
+      items.unshift('<li><b>2019·6·7—9 特大暴雨：</b>平均雨量 152.7 mm，报告 2.7 万人受灾、农作物受灾 1,671 公顷、直接经济损失 1,129 万元。<a href="https://sj.jxnews.cn/index/Mobileindex/news.html?id=53358" target="_blank" rel="noreferrer">视觉江西报道</a></li>');
+    }
+    if(name==='遂川县'){
+      items.push('<li><b>2026·9·5 高坪泥石流：</b>最终 13 人遇难；截至 9 月 10 日 8 时全县累计转移 21,455 人。此为地质灾害及全县转移统计，和洪水直接损失分开。<a href="https://jiangxi.jxnews.com.cn/system/2026/09/11/031241925.shtml" target="_blank" rel="noreferrer">江西日报</a></li>');
+    }
+    box.innerHTML='<h4>历史事件与水情（按来源口径）</h4><ul style="padding-left:16px;margin:0">'+items.join('')+'</ul><div class="event-meta">县级实报、站点水情和全市汇总分开列示；全市数字不会分摊为县级灾情。</div>';
   }
 
   function showCounty(name){
