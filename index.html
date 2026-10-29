@@ -29,8 +29,8 @@ main{padding:20px 24px 34px;max-width:1600px;margin:auto}.hero{display:flex;just
 <main>
 <div class="hero"><div><div class="eyebrow">FLOOD RISK MANAGEMENT</div><h2>从风险识别到响应决策</h2><p>融合县域暴露度、洪水情景与灾情事件，展示评估流程和管理策略</p></div><div class="scope">范围：吉安市域<br>数据状态：多源输入，部分待核</div></div>
 <section class="kpis">
-<div class="card"><div class="kpi-top"><span>县域统计人口合计</span><span>输入表汇总</span></div><div class="kpi-value accent">504.1 <small style="font-size:13px">万人</small></div><div class="kpi-note">13县人口字段算术合计，年份/来源未随表提供</div></div>
-<div class="card"><div class="kpi-top"><span>县域总面积合计</span><span>输入表汇总</span></div><div class="kpi-value">25,301 <small style="font-size:13px">km²</small></div><div class="kpi-note">13县面积字段算术合计，行政边界口径待核</div></div>
+<div class="card"><div class="kpi-top"><span>县域统计人口合计</span><span>输入表汇总</span></div><div class="kpi-value accent">504.1 <small style="font-size:13px">万人</small></div><div class="kpi-note">表内加总504.1万；较2024公报常住人口多69.03万（+15.9%），口径待核</div></div>
+<div class="card"><div class="kpi-top"><span>县域总面积合计</span><span>输入表汇总</span></div><div class="kpi-value">25,301 <small style="font-size:13px">km²</small></div><div class="kpi-note">表内加总25,301 km²；较公开市域面积多18 km²（+0.07%）</div></div>
 <div class="card"><div class="kpi-top"><span>登记重大事件</span><span>已核来源</span></div><div class="kpi-value warn">2 <small style="font-size:13px">组</small></div><div class="kpi-note">2026年9月强降雨、洪水及关联地质灾害</div></div>
 <div class="card"><div class="kpi-top"><span>完整期望年损失</span><span>模型状态</span></div><div class="kpi-value risk">暂不可定</div><div class="kpi-note">损失曲线两端缺失，原1.154亿元算法不成立</div></div>
 </section>
@@ -50,7 +50,7 @@ main{padding:20px 24px 34px;max-width:1600px;margin:auto}.hero{display:flex;just
 <div class="event"><div class="event-date">2026.08</div><div><h3>CSV 记录：“台风红霞”影响吉安多县</h3><p>提交表称8,490人受灾、转移6,328人；列出的遂川/井冈山/永新/安福/万安转移数合计4,399人，尚有1,929人差额未解释。另公开报道的红霞影响期为7月26–28日，日期及吉安归属需原始通报确认。</p></div><a class="source" href="https://www.hunan.gov.cn/hnszf/hnyw/zwdt/202607/t20260729_34035668.html" target="_blank" rel="noreferrer">湖南省政府·日期参照</a><span class="badge pending">总分不符</span></div>
 </div></section>
 <section class="panel"><div class="panel-head"><div><div class="panel-title">数据质检与模型口径</div><span class="panel-sub">把输入值、核验事实和估算结果分层展示</span></div><span class="tag">审计记录</span></div><div class="audit">
-<div class="audit-row"><b>人口与面积</b><span><strong>504.1万人 / 25,301 km²</strong>，只代表13县 CSV 相加；无年份、来源，非官方总量校核。</span></div>
+<div class="audit-row"><b>人口与面积</b><span><strong>504.1万人 / 25,301 km²</strong>，只代表13县 CSV 相加；较2024年末常住人口公报值435.07万人高69.03万（+15.9%）。表内人口可能口径混杂，不能作为全市常住人口。<a class="source" href="https://tjgb.hongheiku.com/djs/58429.html" target="_blank" rel="noreferrer">吉安市统计公报转载</a></span></div>
 <div class="audit-row"><b>情景表</b><span>面积、人口、损失单调递增，算术关系通过；99–103.8m 水位基准、淹没模型及“实测”依据未能从附件追溯。</span></div>
 <div class="audit-row"><b>EAD 重算</b><span>Σ(P×D)=1.154 亿元/年不是积分。仅对已给1%–10%超越概率节点作梯形积分约<strong>0.572亿元</strong>；两端缺失，不等于完整 EAD。</span></div>
 <div class="audit-row"><b>V 曲线</b><span>“人口伤亡概率”随水深升至3%，与概率定义冲突；来源引文不够精确。不能据此估伤亡人数，应重查原始研究和变量口径。</span></div>
