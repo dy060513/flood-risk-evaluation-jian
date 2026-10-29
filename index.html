@@ -66,7 +66,10 @@ th{background:#F0F5FA;color:var(--navy);font-weight:600}
 .cd .name{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .cd .row{display:flex;justify-content:space-between;margin:3px 0}
 .cd .row span:last-child{font-weight:600;color:var(--navy)}
-.lv-badge{display:inline-block;padding:2px 9px;border-radius:12px;color:#fff;font-size:11px;font-weight:700}
+.lv-badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid rgba(11,60,93,.18)}
+.event-card{margin-top:8px;padding:9px 11px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--steel);border-radius:0 8px 8px 0;color:var(--ink);font-size:11.5px;line-height:1.55}
+.event-card h4{font-size:11.5px;color:var(--navy);margin-bottom:4px}
+.event-card .event-meta{color:var(--muted);font-size:10.5px;margin-top:4px}
 .footer{text-align:center;font-size:10.5px;color:rgba(255,255,255,.4);padding:3px 0 8px}
 .leaflet-tooltip.county-label{background:transparent;border:none;box-shadow:none;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6),0 0 4px rgba(0,0,0,.4)}
 .leaflet-tooltip.town-label{background:transparent;border:none;box-shadow:none;font-size:9.5px;color:rgba(255,255,255,.85);text-shadow:0 1px 2px rgba(0,0,0,.5)}
@@ -135,6 +138,7 @@ th{background:#F0F5FA;color:var(--navy);font-weight:600}
         <div class="name">点击地图区县</div>
         <div style="color:var(--muted);font-size:12px">查看人口、面积、风险等级与应对建议</div>
       </div>
+      <div class="event-card" id="countyEventBrief" aria-live="polite"></div>
       <p class="note" id="cdNote">切换上方重现期按钮，13 县风险等级同步变化。</p>
     </div>
 
@@ -1350,6 +1354,24 @@ const LV_NAME = {1:"极低",2:"低",3:"中",4:"高",5:"极高"};
     box.innerHTML = out + extra;
   }
 
+  var COUNTY_EVENT_BRIEFS = {
+    '吉州区':{rain:269},'新干县':{rain:235},'峡江县':{rain:209},'吉安县':{rain:197},
+    '青原区':{rain:180},'吉水县':{rain:155},'永新县':{rain:136},'永丰县':{rain:131},
+    '泰和县':{rain:113},'安福县':{rain:110},'井冈山市':{rain:83},'万安县':{rain:50},'遂川县':{rain:31}
+  };
+  function renderCountyEvent(name){
+    var box = document.getElementById('countyEventBrief');
+    if(!box) return;
+    var event = COUNTY_EVENT_BRIEFS[name];
+    if(!event){box.innerHTML='';return;}
+    var html = '<h4>历史事件简述</h4><div><b>2020·7·10 暴雨洪水：</b>该县过程雨量 '+event.rain+' mm。水文分析报告统计全市 13 县（市、区）共 77.7 万人受灾、8.32 万人紧急转移、直接经济损失 19.2 亿元；未公布安福县单县损失拆分，勿将全市数值当作本县数值。</div>';
+    if(name==='遂川县'){
+      html += '<div style="margin-top:6px"><b>2026·9·5 地质灾害（另列）：</b>高坪镇明坑村石下组泥石流最终 13 人遇难；截至 9 月 10 日 8 时，全县累计转移 21,455 人。此为强降雨诱发的地质灾害统计，不等同于洪水直接损失。</div>';
+    }
+    html += '<div class="event-meta">来源：赣江中游水文水资源监测中心、吉安县水利局《2020年吉安市“7.10”暴雨洪水分析》；遂川后续统计见江西日报 2026-09-11。</div>';
+    box.innerHTML=html;
+  }
+
   function showCounty(name){
     selectedCounty = name;
     var risk = COUNTY_RISK[scene]['各县'][name];
@@ -1366,7 +1388,8 @@ const LV_NAME = {1:"极低",2:"低",3:"中",4:"高",5:"极高"};
     }
     var lv = risk['等级'];
     var bg = LV_COLOR[lv];
-    var html = '<div class="name">'+name+' <span class="lv-badge" style="background:'+bg+'">'+LV_NAME[lv]+'风险</span></div>';
+    var badgeText = (lv===2 || lv===3) ? '#0B3C5D' : (lv===4 ? '#243746' : '#FFFFFF');
+    var html = '<div class="name">'+name+' <span class="lv-badge" style="background:'+bg+';color:'+badgeText+'">'+LV_NAME[lv]+'风险</span></div>';
     if(info){
       html += '<div class="row"><span>人口</span><span>'+info['人口万人']+' 万</span></div>';
       html += '<div class="row"><span>面积</span><span>'+info['面积km2']+' km²</span></div>';
@@ -1378,6 +1401,7 @@ const LV_NAME = {1:"极低",2:"低",3:"中",4:"高",5:"极高"};
       html += '<div style="margin-top:6px;padding:5px;background:#fff3cd;border-radius:5px;font-size:11.5px">栅格级风险区划已叠加（见地图）</div>';
     }
     cd.innerHTML = html;
+    renderCountyEvent(name);
     updateKpis();
   }
 
