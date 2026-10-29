@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>吉安市洪水灾害风险评估系统</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://fastly.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://fastly.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei",sans-serif;background:#0d1326;color:#fff;height:100vh;display:flex;flex-direction:column}
+header{background:#0d1326;border-bottom:1px solid #c9a04e;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+header h1{font-size:18px;color:#c9a04e}
+.scenarios{display:flex;gap:8px}
+.sc-btn{padding:6px 14px;background:#1a2540;border:1px solid #3d5a80;color:#fff;border-radius:4px;cursor:pointer;font-size:13px}
+.sc-btn.active{background:#c9a04e;color:#0d1326;border-color:#c9a04e;font-weight:bold}
+.main{flex:1;display:flex;overflow:hidden}
+#map{flex:1;background:#1a2540}
+.sidebar{width:380px;background:#0d1326;border-left:1px solid #3d5a80;padding:16px;overflow-y:auto}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.kpi-card{background:#1a2540;padding:10px;border-radius:6px}
+.kpi-card .v{font-size:22px;color:#c9a04e;font-weight:bold}
+.kpi-card .l{font-size:11px;color:#888;margin-top:2px}
+.tabs{display:flex;gap:4px;margin-bottom:12px}
+.tab{padding:6px 10px;background:#1a2540;border:1px solid #3d5a80;cursor:pointer;font-size:12px;border-radius:4px}
+.tab.active{background:#c9a04e;color:#0d1326}
+.chart{width:100%;height:200px;margin-bottom:12px}
+.county-name{font-size:20px;color:#c9a04e;margin-bottom:8px}
+.strategy{background:#1a2540;padding:10px;border-radius:6px;font-size:12px;line-height:1.8}
+.leaflet-popup-content-wrapper{background:#1a2540;color:#fff;border-radius:6px}
+.leaflet-popup-tip{background:#1a2540}
+</style>
+</head>
+<body>
+<header>
+<h1>吉安市洪水灾害风险评估与管理系统</h1>
+<div class="scenarios">
+<button class="sc-btn" data-w="w1">10年一遇</button>
+<button class="sc-btn active" data-w="w2">20年(9·4)</button>
+<button class="sc-btn" data-w="w3">30年保证</button>
+<button class="sc-btn" data-w="w4">50年</button>
+<button class="sc-btn" data-w="w5">100年</button>
+</div>
+</header>
+<div class="main">
+<div id="map"></div>
+<div class="sidebar">
+<div class="county-name" id="cname">遂川县</div>
+<div class="kpi">
+<div class="kpi-card"><div class="v" id="k1">62.0万</div><div class="l">人口</div></div>
+<div class="kpi-card"><div class="v" id="k2">3101</div><div class="l">面积 km²</div></div>
+<div class="kpi-card"><div class="v" id="k3">极高</div><div class="l">风险等级</div></div>
+<div class="kpi-card"><div class="v" id="k4">2.8m</div><div class="l">最大水深</div></div>
+</div>
+<div class="tabs">
+<div class="tab active">风险面积</div>
+<div class="tab">暴露度</div>
+</div>
+<div id="pie" class="chart"></div>
+<div id="bar" class="chart"></div>
+<div class="strategy" id="strat">
+<b>应对策略：</b><br>
+· 24小时值班，提前转移高坪/左安/汤湖<br>
+· 水库预泄，重点防守枚江沿线<br>
+· 山洪地质灾害点专人监测
+</div>
+</div>
+</div>
+<script>
+const counties=[
+{n:"吉州区",c:[114.99,27.11],r:5,p:34.6,a:425},
+{n:"青原区",c:[115.02,27.08],r:2,p:24.5,a:915},
+{n:"吉安县",c:[114.96,27.05],r:4,p:46.0,a:2117},
+{n:"吉水县",c:[115.12,27.22],r:4,p:56.0,a:2509},
+{n:"峡江县",c:[115.33,27.37],r:3,p:19.0,a:1287},
+{n:"新干县",c:[115.40,27.77],r:4,p:29.0,a:1248},
+{n:"永丰县",c:[115.42,27.33],r:3,p:43.0,a:2695},
+{n:"泰和县",c:[114.78,26.78],r:4,p:54.0,a:2667},
+{n:"万安县",c:[114.77,26.55],r:4,p:31.0,a:2051},
+{n:"遂川县",c:[114.50,26.33],r:5,p:62.0,a:3101},
+{n:"永新县",c:[114.23,26.96],r:3,p:49.0,a:2195},
+{n:"安福县",c:[114.62,27.39],r:3,p:37.0,a:2793},
+{n:"井冈山市",c:[114.17,26.57],r:4,p:19.0,a:1298}
+];
+const colors={1:"#2ecc71",2:"#f1c40f",3:"#f39c12",4:"#e74c3c",5:"#8e44ad"};
+const map=L.map("map").setView([26.8,114.7],9);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap © CARTO"}).addTo(map);
+let layers=[];
+function drawCircles(w){
+layers.forEach(l=>map.removeLayer(l));layers=[];
+const mult={w1:1,w2:1.5,w3:2,w4:2.8,w5:4}[w];
+counties.forEach(c=>{
+const r=c.r*mult;
+const color=colors[Math.min(5,Math.ceil(r/1.2))];
+const m=L.circle(c.c,{radius:Math.max(5000,c.r*8000*mult),color,fillColor:color,fillOpacity:0.5}).addTo(map);
+m.bindPopup(`<b>${c.n}</b><br>风险等级:${c.r}级<br>人口:${c.p}万<br>面积:${c.a}km²`);
+m.on("click",()=>selectCounty(c));
+layers.push(m);
+});
+}
+drawCircles("w2");
+document.querySelectorAll(".sc-btn").forEach(b=>{
+b.onclick=()=>{
+document.querySelectorAll(".sc-btn").forEach(x=>x.classList.remove("active"));
+b.classList.add("active");
+drawCircles(b.dataset.w);
+};
+});
+const pie=echarts.init(document.getElementById("pie"));
+const bar=echarts.init(document.getElementById("bar"));
+function selectCounty(c){
+document.getElementById("cname").textContent=c.n;
+document.getElementById("k1").textContent=c.p+"万";
+document.getElementById("k2").textContent=c.a;
+document.getElementById("k3").textContent=["","低","较低","中","高","极高"][c.r];
+document.getElementById("k4").textContent=(c.r*0.56).toFixed(1)+"m";
+map.flyTo(c.c,11);
+pie.setOption({
+title:{text:"风险等级面积占比",textStyle:{color:"#ccc",fontSize:12},left:"center"},
+tip:{},
+series:[{type:"pie",radius:["30%","60%"],data:[
+{value:20+c.r*5,name:"极高",itemStyle:{color:"#8e44ad"}},
+{value:25,name:"高",itemStyle:{color:"#e74c3c"}},
+{value:30,name:"中",itemStyle:{color:"#f39c12"}},
+{value:20,name:"低",itemStyle:{color:"#f1c40f"}},
+{value:10,name:"极低",itemStyle:{color:"#2ecc71"}}
+],label:{color:"#fff",fontSize:10}}]
+});
+bar.setOption({
+title:{text:"暴露度指标",textStyle:{color:"#ccc",fontSize:12},left:"center"},
+grid:{left:40,right:20,top:40,bottom:20},
+xAxis:{type:"category",data:["人口","资产","耕地","道路"],axisLabel:{color:"#aaa",fontSize:10}},
+yAxis:{type:"value",axisLabel:{color:"#aaa",fontSize:10}},
+series:[{type:"bar",data:[c.p,c.a*0.3,c.a*0.4,c.a*0.1],itemStyle:{color:"#c9a04e"}}]
+});
+}
+selectCounty(counties[9]);
+window.onresize=()=>{pie.resize();bar.resize()};
+</script>
+</body>
+</html>
