@@ -1,140 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>吉安市洪水灾害风险评估系统</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>吉安市洪水风险评估与管理系统｜核验版</title>
 <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://fastly.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://fastly.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:"Microsoft YaHei",sans-serif;background:#0d1326;color:#fff;height:100vh;display:flex;flex-direction:column}
-header{background:#0d1326;border-bottom:1px solid #c9a04e;padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-header h1{font-size:18px;color:#c9a04e}
-.scenarios{display:flex;gap:8px}
-.sc-btn{padding:6px 14px;background:#1a2540;border:1px solid #3d5a80;color:#fff;border-radius:4px;cursor:pointer;font-size:13px}
-.sc-btn.active{background:#c9a04e;color:#0d1326;border-color:#c9a04e;font-weight:bold}
-.main{flex:1;display:flex;overflow:hidden}
-#map{flex:1;background:#1a2540}
-.sidebar{width:380px;background:#0d1326;border-left:1px solid #3d5a80;padding:16px;overflow-y:auto}
-.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.kpi-card{background:#1a2540;padding:10px;border-radius:6px}
-.kpi-card .v{font-size:22px;color:#c9a04e;font-weight:bold}
-.kpi-card .l{font-size:11px;color:#888;margin-top:2px}
-.tabs{display:flex;gap:4px;margin-bottom:12px}
-.tab{padding:6px 10px;background:#1a2540;border:1px solid #3d5a80;cursor:pointer;font-size:12px;border-radius:4px}
-.tab.active{background:#c9a04e;color:#0d1326}
-.chart{width:100%;height:200px;margin-bottom:12px}
-.county-name{font-size:20px;color:#c9a04e;margin-bottom:8px}
-.strategy{background:#1a2540;padding:10px;border-radius:6px;font-size:12px;line-height:1.8}
-.leaflet-popup-content-wrapper{background:#1a2540;color:#fff;border-radius:6px}
-.leaflet-popup-tip{background:#1a2540}
-</style>
-</head>
+:root{--bg:#071321;--panel:#0d2032;--panel2:#10283d;--line:#1d3a50;--muted:#8da7b7;--text:#e8f1f5;--cyan:#42d6d0;--blue:#52aef5;--amber:#f6c65b;--red:#ff737d;--green:#65d5a3}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 18% -20%,#15344b 0,transparent 42%),var(--bg);color:var(--text);font:14px/1.55 "Microsoft YaHei",system-ui,sans-serif}
+header{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid var(--line);background:#071321eF;position:sticky;top:0;z-index:500}
+.brand{display:flex;align-items:center;gap:13px}.mark{width:38px;height:38px;border:1px solid #29647a;border-radius:12px;display:grid;place-items:center;color:var(--cyan);background:#0e2939;font-weight:800;font-size:18px}.brand h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.3px}.brand small{color:var(--muted);display:block;font-size:11px;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}.status{border:1px solid #725c2e;border-radius:20px;color:var(--amber);padding:5px 10px;font-size:11px;background:#332b1833}.date{color:var(--muted);font-size:12px}
+main{padding:20px 24px 34px;max-width:1600px;margin:auto}.hero{display:flex;justify-content:space-between;align-items:end;margin-bottom:17px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:1.5px;text-transform:uppercase}.hero h2{font-size:23px;margin:4px 0 3px}.hero p{color:var(--muted);margin:0;font-size:12px}.scope{color:#bed0da;font-size:12px;border-left:2px solid var(--cyan);padding:4px 0 4px 11px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px;margin-bottom:14px}.card{border:1px solid var(--line);background:linear-gradient(145deg,#10263a,#0b1b2a);border-radius:12px;padding:15px 16px;box-shadow:0 7px 22px #00000020}.kpi-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.kpi-value{font-size:25px;font-weight:700;letter-spacing:-.4px;margin:6px 0 1px}.kpi-note{font-size:10px;color:#7893a4}.accent{color:var(--cyan)}.warn{color:var(--amber)}.risk{color:var(--red)}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(345px,.8fr);gap:14px}.panel{border:1px solid var(--line);border-radius:12px;background:linear-gradient(145deg,#0d2032,#0a1927);overflow:hidden}.panel-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.panel-title{font-size:14px;font-weight:650}.panel-sub{display:block;color:var(--muted);font-size:10px;margin-top:2px}.tag{font-size:10px;color:var(--amber);border:1px solid #68562f;padding:3px 7px;border-radius:20px}
+.map-wrap{position:relative;height:435px}.map-head-tools{display:flex;gap:8px;align-items:center}.select{background:#10283d;border:1px solid #315168;color:#dceaf0;border-radius:7px;padding:7px 10px;font:inherit;font-size:11px}#map{height:100%;background:#0b1a27}.map-overlay{position:absolute;z-index:400;left:14px;bottom:14px;background:#081827eF;border:1px solid #284457;border-radius:9px;padding:10px 12px;font-size:10px;max-width:285px;box-shadow:0 6px 22px #0007}.legend{display:flex;gap:10px;flex-wrap:wrap;margin:7px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.map-caption{color:#9db3c0;line-height:1.45}
+.leaflet-container{font:12px "Microsoft YaHei",sans-serif}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#10283d;color:#e8f1f5}.leaflet-popup-content{margin:11px 14px}.leaflet-control-attribution{background:#081827cc!important;color:#829aa8!important}.leaflet-control-attribution a{color:#73bde9!important}
+.right-stack{display:grid;grid-template-rows:1fr 1fr;gap:14px}.scenario-body{padding:13px 16px}.scenario-select{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.scenario-btn{background:#10283d;border:1px solid #29495d;color:#9db4c0;border-radius:6px;padding:5px 9px;font-size:10px;cursor:pointer}.scenario-btn.active{color:#061521;background:var(--cyan);border-color:var(--cyan);font-weight:700}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{background:#10283d;border-radius:8px;padding:9px 10px}.metric b{display:block;font-size:17px;color:var(--blue)}.metric span{color:var(--muted);font-size:10px}.scenario-note{color:#96aebc;font-size:10px;line-height:1.55;margin:10px 0 0}
+.risk-flow{padding:14px 16px}.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.flow-cell{padding:9px 7px;text-align:center;background:#10283d;border-radius:8px;border:1px solid #1c3b50}.flow-cell b{display:block;font-size:12px;color:var(--cyan)}.flow-cell span{display:block;font-size:9px;color:var(--muted);margin-top:3px}.formula{margin-top:10px;padding:9px 10px;background:#0a1927;border-left:2px solid var(--amber);color:#c1d1da;font-size:10px;line-height:1.55}
+.lower{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}.events{padding:4px 16px 12px}.event{display:grid;grid-template-columns:80px 1fr auto;gap:11px;padding:12px 0;border-bottom:1px solid #193348;align-items:start}.event:last-child{border-bottom:0}.event-date{font-size:11px;color:var(--cyan);font-weight:700}.event h3{font-size:12px;margin:0 0 3px}.event p{color:#a4b8c3;font-size:10px;margin:0;line-height:1.55}.source{font-size:10px;color:#78c9ec;text-decoration:none;white-space:nowrap}.source:hover{text-decoration:underline}.badge{font-size:9px;border:1px solid #276149;color:var(--green);border-radius:20px;padding:2px 7px;white-space:nowrap}.badge.pending{color:var(--amber);border-color:#725c2e}.badge.correct{color:#ff9a9f;border-color:#754047}
+.audit{padding:14px 16px}.audit-row{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #193348;font-size:10px}.audit-row:last-child{border:0}.audit-row b{color:#c3d4dd;font-weight:600}.audit-row span{color:#9eb3bf}.audit-row strong{color:var(--amber);font-weight:600}.foot{padding:14px 3px;color:#698597;font-size:10px;line-height:1.6}.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.mini{border:1px solid var(--line);background:#0b1b2a;border-radius:10px;padding:12px 14px}.mini h3{font-size:11px;margin:0 0 6px;color:#d5e4eb}.mini p{font-size:10px;color:#8fa7b6;margin:0;line-height:1.6}
+@media(max-width:980px){.layout,.lower{grid-template-columns:1fr}.right-stack{grid-template-columns:1fr 1fr;grid-template-rows:auto}.map-wrap{height:390px}}
+@media(max-width:650px){header{padding:0 14px}.date{display:none}main{padding:14px}.hero{display:block}.scope{margin-top:12px}.kpis{grid-template-columns:1fr 1fr}.right-stack{grid-template-columns:1fr}.event{grid-template-columns:64px 1fr}.event .badge{grid-column:2}.method-grid{grid-template-columns:1fr}.map-wrap{height:360px}}
+</style></head>
 <body>
-<header>
-<h1>吉安市洪水灾害风险评估与管理系统</h1>
-<div class="scenarios">
-<button class="sc-btn" data-w="w1">10年一遇</button>
-<button class="sc-btn active" data-w="w2">20年(9·4)</button>
-<button class="sc-btn" data-w="w3">30年保证</button>
-<button class="sc-btn" data-w="w4">50年</button>
-<button class="sc-btn" data-w="w5">100年</button>
+<header><div class="brand"><div class="mark">水</div><div><h1>吉安市洪水风险评估与管理系统</h1><small>RISK INTELLIGENCE · 演示与核验版</small></div></div><div class="header-right"><span class="status">数据核验中 · 教学演示</span><span class="date">课程设计｜吉安市 · 13 县（市、区）</span></div></header>
+<main>
+<div class="hero"><div><div class="eyebrow">FLOOD RISK MANAGEMENT</div><h2>从风险识别到响应决策</h2><p>融合县域暴露度、洪水情景与灾情事件，展示评估流程和管理策略</p></div><div class="scope">范围：吉安市域<br>数据状态：多源输入，部分待核</div></div>
+<section class="kpis">
+<div class="card"><div class="kpi-top"><span>县域统计人口合计</span><span>输入表汇总</span></div><div class="kpi-value accent">504.1 <small style="font-size:13px">万人</small></div><div class="kpi-note">13县人口字段算术合计，年份/来源未随表提供</div></div>
+<div class="card"><div class="kpi-top"><span>县域总面积合计</span><span>输入表汇总</span></div><div class="kpi-value">25,301 <small style="font-size:13px">km²</small></div><div class="kpi-note">13县面积字段算术合计，行政边界口径待核</div></div>
+<div class="card"><div class="kpi-top"><span>登记重大事件</span><span>已核来源</span></div><div class="kpi-value warn">1 <small style="font-size:13px">组</small></div><div class="kpi-note">2026年9月强降雨、洪水及关联地质灾害</div></div>
+<div class="card"><div class="kpi-top"><span>完整期望年损失</span><span>模型状态</span></div><div class="kpi-value risk">暂不可定</div><div class="kpi-note">损失曲线两端缺失，原1.154亿元算法不成立</div></div>
+</section>
+<div class="layout">
+<section class="panel"><div class="panel-head"><div><div class="panel-title">县域暴露度空间示意</div><span class="panel-sub">人口点位与原始暴露等级；非洪水淹没范围图</span></div><div class="map-head-tools"><select id="countySelect" class="select" aria-label="选择县区"></select></div></div>
+<div class="map-wrap"><div id="map"></div><div class="map-overlay"><b>图层说明</b><div class="legend"><span><i class="dot" style="background:#ff6f75"></i>极高</span><span><i class="dot" style="background:#f5b84c"></i>高</span><span><i class="dot" style="background:#51b8e8"></i>中</span></div><div class="map-caption">圆点为县域代表位置示意，大小按输入人口字段缩放；颜色沿用暴露度 CSV 分级。当前未接入行政区边界、DEM淹没栅格或实时水情。</div></div></div></section>
+<div class="right-stack">
+<section class="panel"><div class="panel-head"><div><div class="panel-title">洪水情景对比</div><span class="panel-sub">情景表原始值｜来源与计算过程待补证</span></div><span class="tag">非实时预报</span></div><div class="scenario-body"><div class="scenario-select" id="scenarioBtns"></div><div class="metrics"><div class="metric"><b id="mDepth">99.0 m</b><span>输入水位值</span></div><div class="metric"><b id="mReturn">10 年</b><span>输入重现期</span></div><div class="metric"><b id="mArea">280 km²</b><span>输入淹没面积</span></div><div class="metric"><b id="mPeople">18.5 万</b><span>输入影响人口</span></div></div><p class="scenario-note" id="scenarioNote">损失 2.1 亿元。场景数据由项目文件提供；“实测”等标签未附站点、日期、计算范围，暂按未核估算展示。</p></div></section>
+<section class="panel"><div class="panel-head"><div><div class="panel-title">风险模型与管理闭环</div><span class="panel-sub">方法框架｜当前页面不输出经标定的风险分值</span></div><span class="tag">H × E × V</span></div><div class="risk-flow"><div class="flow"><div class="flow-cell"><b>危险度 H</b><span>水深、流速、频率</span></div><div class="flow-cell"><b>暴露度 E</b><span>人口、资产、耕地</span></div><div class="flow-cell"><b>脆弱性 V</b><span>深度损失曲线、应急能力</span></div></div><div class="formula">流程：统一空间分辨率 → 计算 H/E/V → 权重标定与敏感性分析 → 分级制图 → 预警、转移与工程管理。当前缺少模型权重、栅格来源及验证样本，县级等级仅保留输入表标签。</div></div></section>
+</div></div>
+<div class="lower">
+<section class="panel"><div class="panel-head"><div><div class="panel-title">灾情事件台账 · 公开来源核对</div><span class="panel-sub">报道统计口径按时点变化；洪水与地质灾害分别记录</span></div><span class="tag">3 条核验结论</span></div><div class="events">
+<div class="event"><div class="event-date">2026.09.04–10</div><div><h3>强降雨与赣江洪水；遂川多点地质灾害</h3><p>央视报道9月4日吉安站达到警戒水位，赣江2026年第1号洪水形成。遂川高坪泥石流最终13人遇难；全县多处地质灾害合计16人遇难。9月10日累计转移21,455人。CSV把16人全部写成“洪水遇难”且把9月4日标作单一事件，类别/时点需修正。</p></div><a class="source" href="https://jiangxi.jxnews.com.cn/system/2026/09/11/031241925.shtml" target="_blank" rel="noreferrer">江西日报·核定</a><span class="badge correct">更正口径</span></div>
+<div class="event"><div class="event-date">2023.04.18–20</div><div><h3>江西多地强降雨洪涝过程</h3><p>江西日报报道截至4月19日，宜春、吉安、抚州三市合计1.7万人受灾；截至4月20日，四市合计5.3万人。现有公开口径不支持 CSV 所列“吉安市单独受灾33,964人”，不把全省/多市统计拆分到吉安县区。</p></div><a class="source" href="https://epaper.jxxw.com.cn/resfile/2023-04-21/02/jxrb-20230421-002.pdf" target="_blank" rel="noreferrer">江西日报·统计</a><span class="badge correct">数值不采信</span></div>
+<div class="event"><div class="event-date">待核实</div><div><h3>CSV 其余条目：2025.07.12、2026.06.05、2026.08“红霞”</h3><p>搜索到的公开材料不足以确认 CSV 的精确受灾人数、转移数及损失数，且部分事件名/统计口径可能混用。暂不纳入地图风险计算或演示 KPI，需补原始政府通报、发布日期和链接。</p></div><span class="source">提交 CSV</span><span class="badge pending">待原始凭据</span></div>
+</div></section>
+<section class="panel"><div class="panel-head"><div><div class="panel-title">数据质检与模型口径</div><span class="panel-sub">把输入值、核验事实和估算结果分层展示</span></div><span class="tag">审计记录</span></div><div class="audit">
+<div class="audit-row"><b>人口与面积</b><span><strong>504.1万人 / 25,301 km²</strong>，只代表13县 CSV 相加；无年份、来源，非官方总量校核。</span></div>
+<div class="audit-row"><b>情景表</b><span>面积、人口、损失单调递增，算术关系通过；99–103.8m 水位基准、淹没模型及“实测”依据未能从附件追溯。</span></div>
+<div class="audit-row"><b>EAD 重算</b><span>Σ(P×D)=1.154 亿元/年不是积分。仅对已给1%–10%超越概率节点作梯形积分约<strong>0.572亿元</strong>；两端缺失，不等于完整 EAD。</span></div>
+<div class="audit-row"><b>V 曲线</b><span>“人口伤亡概率”随水深升至3%，与概率定义冲突；来源引文不够精确。不能据此估伤亡人数，应重查原始研究和变量口径。</span></div>
+<div class="audit-row"><b>展示边界</b><span>不把县域代表点/人口暴露等级描绘成淹没边界；不显示虚构最大水深、风险面积占比或伪精确分县灾情。</span></div>
+</div></section>
 </div>
-</header>
-<div class="main">
-<div id="map"></div>
-<div class="sidebar">
-<div class="county-name" id="cname">遂川县</div>
-<div class="kpi">
-<div class="kpi-card"><div class="v" id="k1">62.0万</div><div class="l">人口</div></div>
-<div class="kpi-card"><div class="v" id="k2">3101</div><div class="l">面积 km²</div></div>
-<div class="kpi-card"><div class="v" id="k3">极高</div><div class="l">风险等级</div></div>
-<div class="kpi-card"><div class="v" id="k4">2.8m</div><div class="l">最大水深</div></div>
-</div>
-<div class="tabs">
-<div class="tab active">风险面积</div>
-<div class="tab">暴露度</div>
-</div>
-<div id="pie" class="chart"></div>
-<div id="bar" class="chart"></div>
-<div class="strategy" id="strat"></div>
-</div>
-</div>
+<div class="method-grid"><div class="mini"><h3>管理建议（教学策略，不替代当地预案）</h3><p>山洪易发乡镇：强化雨量/水位阈值叫应、夜间巡查和小流域预警；沿江低洼区：核对转移路线、避险安置点和重点人群清单；灾后：快速核查道路、桥涵、水库及通信供电，记录损失并回灌模型。</p></div><div class="mini"><h3>下一步补数清单</h3><p>水文站水位流量及基准面、DEM/河网与堤防数据、人口栅格年份、资产/耕地网格、各事件原始通报、损失曲线论文与本地样本、模型权重及历史洪水验证集。</p></div></div>
+<div class="foot">教学展示原型｜资料截止：2026-10-29。地图底图与前端库需联网。外部来源链接仅用于核验和追溯；情景表及县域暴露表仍须补充正式来源。风险评估结果不得直接用于防汛调度、转移指令或工程安全决策。</div>
+</main>
 <script>
 const counties=[
-{n:"吉州区",c:[114.99,27.11],r:5,p:34.6,a:425,d:"4·19洪涝(33964人受灾)"},
-{n:"青原区",c:[115.02,27.08],r:2,p:24.5,a:915,d:"4·19洪涝(转移240人)"},
-{n:"吉安县",c:[114.96,27.05],r:2,p:46.0,a:2117,d:"4·19洪涝"},
-{n:"吉水县",c:[115.12,27.22],r:3,p:56.0,a:2509,d:"4·19洪涝"},
-{n:"峡江县",c:[115.33,27.37],r:3,p:19.0,a:1287,d:"6·5洪涝(4197人受灾)"},
-{n:"新干县",c:[115.40,27.77],r:3,p:29.0,a:1248,d:"6·5洪涝+7·12洪涝(546万损失)"},
-{n:"永丰县",c:[115.42,27.33],r:3,p:43.0,a:2695,d:"4·19+6·5洪涝"},
-{n:"泰和县",c:[114.78,26.78],r:4,p:54.0,a:2667,d:"9·4台风主要受灾区+6·5洪涝"},
-{n:"万安县",c:[114.77,26.55],r:4,p:31.0,a:2051,d:"9·4台风主要受灾区+台风红霞"},
-{n:"遂川县",c:[114.50,26.33],r:5,p:62.0,a:3101,d:"9·4台风(16人遇难,转移1.5万)+红霞+6·5+7·12"},
-{n:"永新县",c:[114.23,26.96],r:4,p:49.0,a:2195,d:"台风红霞(转移180人)+6·5+4·19"},
-{n:"安福县",c:[114.62,27.39],r:3,p:37.0,a:2793,d:"台风红霞(转移20人)+4·19"},
-{n:"井冈山市",c:[114.17,26.57],r:4,p:19.0,a:1298,d:"9·4主要受灾区+红霞(转移1052)+6·5+4·19"}
+{n:"吉州区",c:[114.99,27.11],p:34.6,a:425,e:"极高",dens:8500},
+{n:"青原区",c:[115.02,27.08],p:24.5,a:915,e:"中",dens:3200},
+{n:"吉安县",c:[114.96,27.05],p:46,a:2117,e:"高",dens:2800},
+{n:"吉水县",c:[115.12,27.22],p:56,a:2509,e:"高",dens:2600},
+{n:"峡江县",c:[115.33,27.37],p:19,a:1287,e:"中",dens:2200},
+{n:"新干县",c:[115.40,27.77],p:29,a:1248,e:"高",dens:3500},
+{n:"永丰县",c:[115.42,27.33],p:43,a:2695,e:"中",dens:1800},
+{n:"泰和县",c:[114.78,26.78],p:54,a:2667,e:"高",dens:3100},
+{n:"万安县",c:[114.77,26.55],p:31,a:2051,e:"高",dens:2400},
+{n:"遂川县",c:[114.50,26.33],p:62,a:3101,e:"极高",dens:2000},
+{n:"永新县",c:[114.23,26.96],p:49,a:2195,e:"中",dens:1900},
+{n:"安福县",c:[114.62,27.39],p:37,a:2793,e:"中",dens:2100},
+{n:"井冈山市",c:[114.17,26.57],p:19,a:1298,e:"高",dens:4200}
 ];
-const colors={1:"#2ecc71",2:"#f1c40f",3:"#f39c12",4:"#e74c3c",5:"#8e44ad"};
-const map=L.map("map").setView([26.8,114.7],9);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap © CARTO"}).addTo(map);
-let layers=[];
-function drawCircles(w){
-layers.forEach(l=>map.removeLayer(l));layers=[];
-const mult={w1:1,w2:1.5,w3:2,w4:2.8,w5:4}[w];
-counties.forEach(c=>{
-const r=c.r*mult;
-const color=colors[Math.min(5,Math.ceil(r/1.2))];
-const m=L.circle(c.c,{radius:Math.max(5000,c.r*8000*mult),color,fillColor:color,fillOpacity:0.5}).addTo(map);
-m.bindPopup(`<b>${c.n}</b><br>风险等级:${c.r}级<br>人口:${c.p}万<br>面积:${c.a}km²<br><span style="color:#c9a04e">${c.d}</span>`);
-m.on("click",()=>selectCounty(c));
-layers.push(m);
+const scenarios=[
+{label:"10年",w:"99.0",r:10,a:280,p:18.5,l:2.1,source:"原表标注“实测（水利局）”，未提供站点、日期与空间模型。"},
+{label:"20年",w:"100.5",r:20,a:520,p:35.2,l:4.8,source:"原表标注“9·4实际”，未提供洪峰站点、复现期分析及损失估算过程。"},
+{label:"30年",w:"101.45",r:30,a:760,p:52,l:7.5,source:"原表标注“堤防设计”，设计标准不等于实测灾情，范围待查。"},
+{label:"50年",w:"102.5",r:50,a:1150,p:78,l:12.3,source:"原表说明为线性外推，属估算值。"},
+{label:"100年",w:"103.8",r:100,a:1750,p:115,l:21,source:"原表说明为线性外推，属估算值。"}
+];
+const color={极高:"#ff6f75",高:"#f5b84c",中:"#51b8e8",低:"#65d5a3"};
+const sel=document.getElementById("countySelect");
+counties.forEach((c,i)=>{const o=document.createElement("option");o.value=i;o.textContent=c.n;sel.appendChild(o)});
+const map=L.map("map",{zoomControl:true}).setView([26.98,114.75],8);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{attribution:"© OpenStreetMap © CARTO"}).addTo(map);
+const markers=[];
+counties.forEach((c,i)=>{
+const m=L.circleMarker([c.c[1],c.c[0]],{radius:6+Math.sqrt(c.p)*1.35,color:color[c.e],fillColor:color[c.e],weight:1.5,fillOpacity:.68});
+m.bindPopup("<b>"+c.n+"</b><br>人口（输入表）："+c.p+" 万<br>面积（输入表）："+c.a+" km²<br>暴露等级（输入表）："+c.e+"<br><small>点位为代表坐标示意</small>");
+m.on("click",()=>{sel.value=i});m.addTo(map);markers.push(m)
 });
-}
-drawCircles("w2");
-document.querySelectorAll(".sc-btn").forEach(b=>{
-b.onclick=()=>{
-document.querySelectorAll(".sc-btn").forEach(x=>x.classList.remove("active"));
-b.classList.add("active");
-drawCircles(b.dataset.w);
-};
-});
-const pie=echarts.init(document.getElementById("pie"));
-const bar=echarts.init(document.getElementById("bar"));
-function selectCounty(c){
-document.getElementById("cname").textContent=c.n;
-document.getElementById("k1").textContent=c.p+"万";
-document.getElementById("k2").textContent=c.a;
-document.getElementById("k3").textContent=["","低","较低","中","高","极高"][c.r];
-document.getElementById("k4").textContent=(c.r*0.56).toFixed(1)+"m";
-const stratBox=document.getElementById("strat");
-const stratMap={5:"24小时值班,提前转移沿河低洼区,水库预泄",4:"重点防守,沿河演练,预警到户",3:"关注山洪地质灾害,重点村排查",2:"常规值守,关注雨情",1:"低风险"};
-stratBox.innerHTML=`<b>历史受灾记录：</b><br><span style="color:#c9a04e">${c.d}</span><br><br><b>应对策略：</b><br>· ${stratMap[c.r]}`;
-map.flyTo(c.c,11);
-pie.setOption({
-title:{text:"风险等级面积占比",textStyle:{color:"#ccc",fontSize:12},left:"center"},
-tooltip:{},
-series:[{type:"pie",radius:["30%","60%"],data:[
-{value:20+c.r*5,name:"极高",itemStyle:{color:"#8e44ad"}},
-{value:25,name:"高",itemStyle:{color:"#e74c3c"}},
-{value:30,name:"中",itemStyle:{color:"#f39c12"}},
-{value:20,name:"低",itemStyle:{color:"#f1c40f"}},
-{value:10,name:"极低",itemStyle:{color:"#2ecc71"}}
-],label:{color:"#fff",fontSize:10}}]
-});
-bar.setOption({
-title:{text:"暴露度指标",textStyle:{color:"#ccc",fontSize:12},left:"center"},
-grid:{left:40,right:20,top:40,bottom:20},
-xAxis:{type:"category",data:["人口","资产","耕地","道路"],axisLabel:{color:"#aaa",fontSize:10}},
-yAxis:{type:"value",axisLabel:{color:"#aaa",fontSize:10}},
-series:[{type:"bar",data:[c.p,c.a*0.3,c.a*0.4,c.a*0.1],itemStyle:{color:"#c9a04e"}}]
-});
-}
-selectCounty(counties[9]);
-window.onresize=()=>{pie.resize();bar.resize()};
-</script>
-</body>
-</html>
+sel.addEventListener("change",()=>{const c=counties[+sel.value];map.flyTo([c.c[1],c.c[0]],10,{duration:.7});markers[+sel.value].openPopup()});
+const btns=document.getElementById("scenarioBtns");
+scenarios.forEach((s,i)=>{const b=document.createElement("button");b.className="scenario-btn"+(!i?" active":"");b.textContent=s.label;b.onclick=()=>{document.querySelectorAll(".scenario-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");showScenario(i)};btns.appendChild(b)});
+function showScenario(i){const s=scenarios[i];document.getElementById("mDepth").textContent=s.w+" m";document.getElementById("mReturn").textContent=s.r+" 年";document.getElementById("mArea").textContent=s.a+" km²";document.getElementById("mPeople").textContent=s.p+" 万";document.getElementById("scenarioNote").textContent="输入损失 "+s.l+" 亿元。"+s.source+"所有字段均为项目表值，不代表系统计算或实时预报。"}
+showScenario(0);
+</script></body></html>
